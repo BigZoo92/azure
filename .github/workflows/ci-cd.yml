@@ -68,4 +68,3 @@ jobs:
           skip_app_build: true
           # ⚠️ On envoie le dossier de l’API déjà compilé :
           api_location: apps/api
-          skip_api_build: true
