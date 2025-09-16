@@ -5,17 +5,8 @@
     "exclude": [
       "/api/*",
       "/assets/*",
-      "/*.css",
-      "/*.js",
-      "/*.ico",
-      "/*.png",
-      "/*.svg",
-      "/*.webp",
-      "/*.txt",
-      "/*.xml",
-      "/*.woff",
-      "/*.woff2",
-      "/*.ttf"
+      "/*.css","/*.js","/*.ico","/*.png","/*.svg","/*.webp",
+      "/*.txt","/*.xml","/*.woff","/*.woff2","/*.ttf"
     ]
   }
 }
