@@ -1,1 +1,1 @@
-import "./functions/users.ts";
+import "./functions/users.js";
