@@ -1,4 +1,3 @@
-# .github/workflows/swa.yml
 name: Deploy to Azure Static Web Apps
 
 on:
@@ -18,12 +17,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node 20 + Corepack
+      - name: Setup Node 20
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: "pnpm"
-      - run: corepack enable
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false
 
       - name: Install workspace deps
         run: pnpm install --frozen-lockfile=false
@@ -34,6 +39,7 @@ jobs:
       - name: Build api
         run: pnpm -C apps/api build
 
+      # Node modules prod pour Functions (runtime)
       - name: API runtime deps only
         run: pnpm -C apps/api install --prod --no-optional
 
@@ -42,7 +48,6 @@ jobs:
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
           action: upload
-          # On envoie directement les artefacts compilés :
           app_location: apps/web
           app_artifact_location: apps/web/dist
           skip_app_build: true
