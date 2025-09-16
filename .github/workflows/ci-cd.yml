@@ -53,7 +53,8 @@ jobs:
           cat apps/api/host.json
           echo "--- dist functions ---"
           ls -la apps/api/dist
-          ls -la apps/api/dist/functions
+          ls -la apps/api/dist/src
+          ls -la apps/api/dist/src/functions
           ls -la apps/api
 
       - name: Deploy to Azure Static Web Apps (upload prebuilt)
