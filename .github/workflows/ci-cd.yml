@@ -1,3 +1,4 @@
+# .github/workflows/swa.yml
 name: Deploy to Azure Static Web Apps
 
 on:
@@ -16,11 +17,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 10.16.1
           run_install: false
+
       - name: Setup Node 20
         uses: actions/setup-node@v4
         with:
@@ -31,28 +34,35 @@ jobs:
       - name: Install workspace deps
         run: pnpm install --frozen-lockfile=false
 
-      - name: Build web
+      - name: Build web (Vite)
         run: pnpm -C apps/web build
 
-      - name: Build api
+      - name: Build api (Functions ESM)
         run: pnpm -C apps/api build
 
-      # Node modules prod pour Functions (runtime)
+      # Dépendances runtime (prod) pour l’API côté Functions
       - name: API runtime deps only
         run: pnpm -C apps/api install --prod --no-optional
 
-      - name: Inspect built index.html
+      # (debug) montrer exactement ce qu’on va déployer
+      - name: Inspect artifact that will be uploaded
         run: |
+          echo "--- index.html ---"
           sed -n '1,120p' apps/web/dist/index.html
+          echo "--- assets ---"
           ls -la apps/web/dist/assets
-          ls -la ./
-          ls -la apps/web/dist/assets
+          echo "--- staticwebapp.config.json ---"
+          cat apps/web/dist/staticwebapp.config.json
 
       - name: Deploy to Azure Static Web Apps (upload prebuilt)
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
           action: upload
-          app_location: apps/web
-          output_location: dist
-          api_location: apps/api
+          # ⚠️ On envoie le dossier DIST lui-même (et rien d’autre) :
+          app_location: apps/web/dist
+          app_artifact_location: .
+          skip_app_build: true
+          # ⚠️ On envoie le dossier de l’API déjà compilé :
+          api_location: apps/api/dist
+          skip_api_build: true
