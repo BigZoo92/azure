@@ -4,37 +4,25 @@ import {
   HttpResponseInit,
   InvocationContext,
 } from "@azure/functions";
+import { listUsers, createUser } from "../data/usersRepo.js";
 
-type User = { id: string; name: string };
-
-const db: User[] = [
-  { id: "1", name: "Ada Lovelace" },
-  { id: "2", name: "Alan Turing" },
-];
-
-// GET /api/users
 export async function getUsers(
   req: HttpRequest,
   ctx: InvocationContext
 ): Promise<HttpResponseInit> {
-  return { jsonBody: db, status: 200 };
+  const users = await listUsers();
+  return { status: 200, jsonBody: users };
 }
 
-// POST /api/users  { name: string }
-export async function createUser(
+export async function postUser(
   req: HttpRequest,
   ctx: InvocationContext
 ): Promise<HttpResponseInit> {
-  try {
-    const body = (await req.json()) as { name?: string };
-    if (!body?.name)
-      return { status: 400, jsonBody: { error: "name is required" } };
-    const user: User = { id: crypto.randomUUID(), name: body.name };
-    db.push(user);
-    return { status: 201, jsonBody: user };
-  } catch {
-    return { status: 400, jsonBody: { error: "invalid json" } };
-  }
+  const body = (await req.json().catch(() => null)) as { name?: string } | null;
+  if (!body?.name)
+    return { status: 400, jsonBody: { error: "name is required" } };
+  const user = await createUser(body.name);
+  return { status: 201, jsonBody: user };
 }
 
 app.http("getUsers", {
@@ -43,10 +31,9 @@ app.http("getUsers", {
   route: "users",
   handler: getUsers,
 });
-
 app.http("createUser", {
   methods: ["POST"],
   authLevel: "anonymous",
   route: "users",
-  handler: createUser,
+  handler: postUser,
 });

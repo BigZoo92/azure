@@ -1,0 +1,21 @@
+# Node / build
+node_modules/
+dist/
+.build/
+.temp/
+
+# Vite
+.vite/
+
+# Azure Functions
+apps/api/local.settings.json
+apps/api/.funcignore
+apps/api/bin/
+apps/api/obj/
+
+# OS/Editors
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json

@@ -1,17 +1,20 @@
 {
   "name": "api",
   "private": true,
-  "type": "module",
+  "main": "dist/src/functions/*.js",
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "start": "func start",
-    "start:inspect": "func start --language-worker -- --inspect=9229",
+    "dev": "concurrently -k \"tsc -w -p tsconfig.json\" \"func start dist --verbose\"",
     "test": "echo \"(tests plus tard)\""
   },
   "dependencies": {
+    "@azure/cosmos": "^4.5.1",
     "@azure/functions": "^4.4.0"
   },
   "devDependencies": {
+    "concurrently": "^9.0.0",
+    "cpy-cli": "^6.0.0",
     "typescript": "^5.5.0"
   }
 }
