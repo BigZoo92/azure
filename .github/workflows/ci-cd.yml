@@ -64,6 +64,12 @@ jobs:
           echo "--- staticwebapp.config.json ---"
           cat apps/web/dist/staticwebapp.config.json
 
+      - name: Inspect API zip content (pre-upload)
+        run: |
+          node -e "console.log(require('./apps/api/package.json'))"
+          ls -la apps/api/dist/src/functions
+          head -n 20 apps/api/dist/src/functions/users.js
+
       - name: Deploy to Azure Static Web Apps (upload prebuilt)
         uses: Azure/static-web-apps-deploy@v1
         with:

@@ -5,6 +5,8 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "rootDir": "src", 
+    "target": "ES2022",
+    "strict": true
   },
   "include": ["src"]
 }
