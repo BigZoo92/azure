@@ -2,6 +2,18 @@
   "version": "2.0",
   "extensionBundle": {
     "id": "Microsoft.Azure.Functions.ExtensionBundle",
-    "version": "[3.*, 4.0.0)"
+    "version": "[4.*, 5.0.0)"
+  },
+  "logging": {
+    "applicationInsights": {
+      "samplingSettings": { "isEnabled": true, "samplingPercentage": 10 },
+      "enableLiveMetrics": true
+    },
+    "logLevel": {
+      "Default": "Information",
+      "Host.Results": "Information",
+      "Function.getUsers": "Information",
+      "Function.createUser": "Information"
+    }
   }
 }
