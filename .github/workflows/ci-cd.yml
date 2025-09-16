@@ -51,11 +51,11 @@ jobs:
           echo "--- api host.json ---"
           cat apps/api/host.json
           echo "--- dist functions ---"
-          ls -la apps/api/dist
-          ls -la apps/api/dist/functions
+          ls -la apps/api/dist/src
+          ls -la apps/api/dist/src/functions
           echo "--- index.js head ---"
-          head -n 20 apps/api/dist/index.js
-          head -n 20 apps/api/dist/functions/users.js
+          head -n 20 apps/api/dist/src/index.js
+          head -n 20 apps/api/dist/src/functions/users.js
 
       - name: Deploy to Azure Static Web Apps (upload prebuilt)
         uses: Azure/static-web-apps-deploy@v1
