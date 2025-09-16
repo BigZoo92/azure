@@ -53,21 +53,8 @@ jobs:
           echo "--- dist functions ---"
           ls -la apps/api/dist/src
           ls -la apps/api/dist/src/functions
-
-      # (debug) montrer exactement ce qu’on va déployer
-      - name: Inspect artifact that will be uploaded
-        run: |
-          echo "--- index.html ---"
-          sed -n '1,120p' apps/web/dist/index.html
-          echo "--- assets ---"
-          ls -la apps/web/dist/assets
-          echo "--- staticwebapp.config.json ---"
-          cat apps/web/dist/staticwebapp.config.json
-
-      - name: Inspect API zip content (pre-upload)
-        run: |
-          node -e "console.log(require('./apps/api/package.json'))"
-          ls -la apps/api/dist/src/functions
+          echo "--- index.js head ---"
+          head -n 20 apps/api/dist/src/index.js
           head -n 20 apps/api/dist/src/functions/users.js
 
       - name: Deploy to Azure Static Web Apps (upload prebuilt)
