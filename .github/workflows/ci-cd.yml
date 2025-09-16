@@ -44,7 +44,6 @@ jobs:
       - name: API runtime deps only
         run: pnpm -C apps/api install --prod --no-optional
 
-      # (debug) montrer exactement ce qu’on va déployer
       - name: Inspect API zip content (pre-upload)
         run: |
           echo "--- api package.json ---"
@@ -53,9 +52,17 @@ jobs:
           cat apps/api/host.json
           echo "--- dist functions ---"
           ls -la apps/api/dist
-          ls -la apps/api/dist/src
-          ls -la apps/api/dist/src/functions
-          ls -la apps/api
+          ls -la apps/api/dist/functions
+
+      # (debug) montrer exactement ce qu’on va déployer
+      - name: Inspect artifact that will be uploaded
+        run: |
+          echo "--- index.html ---"
+          sed -n '1,120p' apps/web/dist/index.html
+          echo "--- assets ---"
+          ls -la apps/web/dist/assets
+          echo "--- staticwebapp.config.json ---"
+          cat apps/web/dist/staticwebapp.config.json
 
       - name: Deploy to Azure Static Web Apps (upload prebuilt)
         uses: Azure/static-web-apps-deploy@v1
