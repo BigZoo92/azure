@@ -55,3 +55,4 @@ jobs:
           action: upload
           app_location: apps/web
           output_location: dist
+          api_location: apps/api
