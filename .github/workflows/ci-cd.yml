@@ -41,6 +41,11 @@ jobs:
       - name: API runtime deps only
         run: pnpm -C apps/api install --prod --no-optional
 
+      - name: Show SWA config in dist
+        run: |
+          ls -la apps/web/dist
+          cat apps/web/dist/staticwebapp.config.json
+
       - name: Deploy to Azure Static Web Apps (upload prebuilt)
         uses: Azure/static-web-apps-deploy@v1
         with:
