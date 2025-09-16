@@ -51,8 +51,8 @@ jobs:
           echo "--- api host.json ---"
           cat apps/api/host.json
           echo "--- dist functions ---"
-          ls -la apps/api/dist
-          ls -la apps/api/dist/functions
+          ls -la apps/api/dist/src
+          ls -la apps/api/dist/src/functions
 
       # (debug) montrer exactement ce qu’on va déployer
       - name: Inspect artifact that will be uploaded
