@@ -6,7 +6,11 @@ settings:
 
 importers:
 
-  .: {}
+  .:
+    dependencies:
+      azure-devops-users:
+        specifier: 'link:'
+        version: 'link:'
 
   apps/api:
     dependencies:
