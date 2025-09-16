@@ -1,1 +1,1 @@
-import "./functions/users.js";
+import "./functions/users";

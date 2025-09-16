@@ -1,9 +1,8 @@
 {
   "name": "api",
   "private": true,
-   "type": "module",  
+  "type": "commonjs",
   "main": "dist/src/index.js",
-  "engines": { "node": ">=20.19.0" },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "start": "func start",
