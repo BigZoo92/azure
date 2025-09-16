@@ -13,6 +13,7 @@
     "@azure/functions": "^4.4.0"
   },
   "devDependencies": {
+    "@types/node": "^24.5.0",
     "concurrently": "^9.0.0",
     "cpy-cli": "^6.0.0",
     "typescript": "^5.5.0"
