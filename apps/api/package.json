@@ -1,0 +1,17 @@
+{
+  "name": "api",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "func start",
+    "start:inspect": "func start --language-worker -- --inspect=9229",
+    "test": "echo \"(tests plus tard)\""
+  },
+  "dependencies": {
+    "@azure/functions": "^4.4.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "name": "azure-devops-users",
+  "private": true,
+  "scripts": {
+    "dev:web": "pnpm -C apps/web dev",
+    "build:web": "pnpm -C apps/web build",
+    "preview:web": "pnpm -C apps/web preview",
+    "dev:api": "pnpm -C apps/api start",
+    "build:api": "pnpm -C apps/api build",
+    "dev": "pnpm -C apps/api start & pnpm -C apps/web dev",
+    "typecheck": "tsc -v"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "description": "",
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.16.1"
+}
