@@ -17,7 +17,6 @@ export function ai() {
     .setAutoCollectDependencies(true) // utile pour Cosmos, HTTP sortants
     .setAutoCollectExceptions(true)
     .setSendLiveMetrics(true)
-    .setAutoCollectPerformance(true)
     .setDistributedTracingMode(appInsights.DistributedTracingModes.AI)
     .start();
   started = true;

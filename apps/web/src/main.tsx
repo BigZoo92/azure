@@ -4,7 +4,7 @@ import "./index.css";
 import { Auth } from "./pages/auth";
 import PollPage from "./pages/polls";
 import { RequireAuth, RedirectIfAuth } from "@/pages/routes-guard";
-import { AuthProvider } from "./auth/authContext";
+import { AuthProvider } from "./auth/AuthContext";
 
 createRoot(document.getElementById("root")!).render(
   <AuthProvider>
