@@ -6,10 +6,8 @@ import { VotesTable } from "@/components/votes-table";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { useNavigate } from "react-router-dom";
 
 export default function PollPage() {
-  const navigate = useNavigate();
   const {
     user,
     loading: sessionLoading,
