@@ -5,8 +5,16 @@
     "exclude": ["/api/*","/assets/*","/*.css","/*.js","/*.ico","/*.png","/*.svg","/*.webp","/*.txt","/*.xml","/*.woff","/*.woff2","/*.ttf"]
   },
   "routes": [
-    { "route": "/api/votes", "allowedRoles": ["anonymous"] },
-    { "route": "/api/*", "allowedRoles": ["authenticated"] }
+    { "route": "/", "rewrite": "/index.html" },
+    { "route": "/auth", "rewrite": "/index.html" },
+
+    { "route": "/api/me",           "allowedRoles": ["anonymous", "authenticated"] },
+    { "route": "/api/auth/login",   "allowedRoles": ["anonymous", "authenticated"] },
+    { "route": "/api/auth/signup",  "allowedRoles": ["anonymous", "authenticated"] },
+    { "route": "/api/auth/logout",  "allowedRoles": ["anonymous", "authenticated"] },
+
+    { "route": "/api/votes",        "allowedRoles": ["anonymous", "authenticated"] },
+    { "route": "/api/vote",         "allowedRoles": ["authenticated"] }
   ],
   "responseOverrides": {
     "401": { "redirect": "/.auth/login/github?post_login_redirect_uri=/" }
