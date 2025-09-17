@@ -1,10 +1,6 @@
+// apps/api/src/functions/me.ts
 import { app, HttpRequest, InvocationContext } from "@azure/functions";
-import {
-  readCookie,
-  readJwt,
-  createJwt,
-  cookieResponse,
-} from "../lib/session.js";
+import { readCookie, readJwt } from "../lib/session.js";
 import { findUserById, upsertGithubUser } from "../data/usersRepo.js";
 import { trackLogin } from "../lib/telemetry.js";
 
@@ -34,25 +30,30 @@ app.http("me", {
   methods: ["GET"],
   authLevel: "anonymous",
   handler: async (req: HttpRequest, _ctx: InvocationContext) => {
+    // 1) Utilisateur local via cookie "session" (JWT signé par NOUS)
     const token = readCookie(req as any, "session");
     if (token) {
       try {
-        const claims = await readJwt(token);
+        const claims = await readJwt(token); // { uid, name, provider }
         const user = await findUserById(claims.uid);
-        if (user)
+        if (user) {
           return {
             status: 200,
+            headers: { "Cache-Control": "no-store" },
             jsonBody: {
               id: user.id,
               name: user.name,
               email: user.email,
-              provider: user.provider,
+              provider: user.provider, // "local"
             },
           };
+        }
       } catch {
-        /* cookie invalide => on tente SWA */
+        // token invalide → on essaiera SWA ci-dessous
       }
     }
+
+    // 2) Utilisateur GitHub via SWA (ne PAS créer de cookie ici)
     const p = getSwaPrincipal(req);
     if (p?.provider === "github" && p.sub) {
       const user = await upsertGithubUser(
@@ -61,26 +62,24 @@ app.http("me", {
         p.email
       );
       trackLogin(user.id, "github");
-      const jwt = await createJwt({
-        uid: user.id,
-        name: user.name,
-        provider: "github",
-      });
-      return cookieResponse(
-        {
-          status: 200,
-          jsonBody: {
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            provider: user.provider,
-          },
+      // IMPORTANT : pas de cookieResponse ici → évite la "reconnexion" après logout SWA
+      return {
+        status: 200,
+        headers: { "Cache-Control": "no-store" },
+        jsonBody: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          provider: user.provider, // "github"
         },
-        "session",
-        jwt,
-        7 * 24 * 3600
-      );
+      };
     }
-    return { status: 200, jsonBody: null };
+
+    // 3) Pas connecté
+    return {
+      status: 200,
+      headers: { "Cache-Control": "no-store" },
+      jsonBody: null,
+    };
   },
 });
