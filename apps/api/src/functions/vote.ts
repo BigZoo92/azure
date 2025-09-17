@@ -1,36 +1,35 @@
 import { app } from "@azure/functions";
-import { getClientPrincipal, getAuthId } from "../lib/auth.js";
+import { getUserIdFromRequest } from "../lib/authz.js";
 import { upsertVote } from "../data/votesRepo.js";
+import { trackError, trackVote } from "../lib/telemetry.js";
 
 app.http("vote", {
   route: "vote",
   methods: ["POST"],
-  authLevel: "anonymous", // protégé par SWA (allowedRoles)
-  handler: async (req: any, ctx) => {
-    const principal = getClientPrincipal(req);
-    if (!principal || !principal.userRoles?.includes("authenticated")) {
-      return { status: 401, jsonBody: { error: "not authenticated" } };
+  authLevel: "anonymous", // on gère l'auth nous-mêmes
+  handler: async (req, ctx) => {
+    const userId = await getUserIdFromRequest(req);
+    if (!userId) {
+      return { status: 401, jsonBody: { error: "not_authenticated" } };
     }
 
-    const userId = getAuthId(principal);
     const body = (await req.json().catch(() => null)) as {
       choice?: string;
     } | null;
     const choice = body?.choice;
-
     if (choice !== "yes" && choice !== "no") {
       return {
         status: 400,
         jsonBody: { error: "choice must be 'yes' or 'no'" },
       };
     }
-
+    trackVote(userId, choice as "yes" | "no");
     try {
-      const vote = await upsertVote(userId, choice as "yes" | "no");
+      const vote = await upsertVote(userId, choice);
       ctx.log(`vote OK user=${userId} choice=${choice}`);
-      // 200 (remplacement) ou 201 (création) — on reste simple: 200
       return { status: 200, jsonBody: vote };
     } catch (e: any) {
+      trackError(e, { where: "vote" });
       ctx.error?.(`vote ERROR: ${e?.message || e}`);
       return { status: 500, jsonBody: { error: "internal_error" } };
     }

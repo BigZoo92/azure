@@ -1,6 +1,6 @@
 import { app } from "@azure/functions";
 import { getClientPrincipal, getAuthId } from "../lib/auth.js";
-import { createOrUpdateUser } from "../data/usersRepo.js";
+import { createLocalUser } from "../data/usersRepo.js";
 
 app.http("createUser", {
   route: "user",
@@ -17,16 +17,22 @@ app.http("createUser", {
     const body = (await req.json().catch(() => null)) as {
       pseudo?: string;
       email?: string;
+      passwordHash?: string;
     } | null;
     const pseudo = body?.pseudo?.trim();
     const email = body?.email?.trim() || principal.userDetails;
+    const passwordHash = body?.passwordHash?.trim();
 
     if (!pseudo) {
       return { status: 400, jsonBody: { error: "pseudo is required" } };
     }
 
     try {
-      const user = await createOrUpdateUser({ authId, pseudo, email });
+      const user = await createLocalUser({
+        name: pseudo,
+        email: email ?? "",
+        passwordHash: passwordHash ?? "",
+      });
       ctx.log(`createUser OK authId=${authId} pseudo="${pseudo}"`);
       return { status: 201, jsonBody: user };
     } catch (e: any) {

@@ -1,22 +1,28 @@
 {
   "name": "api",
   "private": true,
-   "type": "module",  
+  "type": "module",
   "main": "dist/src/functions/*.js",
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "start": "func start",
     "dev": "concurrently -k \"tsc -w -p tsconfig.json\" \"func start dist --verbose\"",
-    "test": "echo \"(tests plus tard)\""
+    "test": "vitest",
+    "test:ci": "vitest run --reporter=dot"
   },
   "dependencies": {
     "@azure/cosmos": "^4.5.1",
-    "@azure/functions": "^4.4.0"
+    "@azure/functions": "^4.4.0",
+    "applicationinsights": "^3.9.0",
+    "bcryptjs": "^3.0.2",
+    "jose": "^5.3.0"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^3.0.0",
     "@types/node": "^24.5.0",
     "concurrently": "^9.0.0",
     "cpy-cli": "^6.0.0",
-    "typescript": "^5.5.0"
+    "typescript": "^5.5.0",
+    "vitest": "^3.2.4"
   }
 }
