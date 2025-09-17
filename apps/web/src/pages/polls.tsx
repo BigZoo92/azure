@@ -30,6 +30,16 @@ export default function PollPage() {
   }
 
   async function logout() {
+    if (user?.provider === "github") {
+      window.location.href = "/.auth/logout?post_logout_redirect_uri=/auth";
+    } else {
+      await fetch("/api/auth/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+      window.location.href = "/auth";
+    }
+
     await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
     await refreshSession();
     await refresh();
@@ -55,13 +65,7 @@ export default function PollPage() {
           </div>
 
           <div className="flex gap-2">
-            <Button
-              onClick={() => {
-                navigate("/auth");
-                logout();
-              }}
-              variant="secondary"
-            >
+            <Button onClick={logout} variant="secondary">
               Se déconnecter
             </Button>
           </div>
