@@ -1,61 +1,37 @@
-import {
-  app,
-  HttpRequest,
-  HttpResponseInit,
-  InvocationContext,
-} from "@azure/functions";
-import { listUsers, createUser } from "../data/usersRepo.js";
-
-export async function getUsers(
-  req: HttpRequest,
-  ctx: InvocationContext
-): Promise<HttpResponseInit> {
-  const users = await listUsers();
-  return { status: 200, jsonBody: users };
-}
-
-export async function postUser(
-  req: HttpRequest,
-  ctx: InvocationContext
-): Promise<HttpResponseInit> {
-  const body = (await req.json().catch(() => null)) as { name?: string } | null;
-  if (!body?.name)
-    return { status: 400, jsonBody: { error: "name is required" } };
-  const user = await createUser(body.name);
-  return { status: 201, jsonBody: user };
-}
-
-app.http("getUsers", {
-  methods: ["GET"],
-  authLevel: "anonymous",
-  route: "users",
-  handler: async (req, ctx) => {
-    const t0 = Date.now();
-    const users = await listUsers();
-    ctx.log("users.list", { count: users.length });
-    return {
-      status: 200,
-      jsonBody: users,
-      headers: { "x-duration-ms": String(Date.now() - t0) },
-    };
-  },
-});
+import { app } from "@azure/functions";
+import { getClientPrincipal, getAuthId } from "../lib/auth.js";
+import { createOrUpdateUser } from "../data/usersRepo.js";
 
 app.http("createUser", {
+  route: "user",
   methods: ["POST"],
   authLevel: "anonymous",
-  route: "users",
-  handler: async (req, ctx) => {
-    const body = (await req.json().catch(() => null)) as {
-      name?: string;
-    } | null;
-    if (!body?.name) {
-      ctx.log;
-      ctx.log("users.create.missing_name");
-      return { status: 400, jsonBody: { error: "name is required" } };
+  handler: async (req: any, ctx) => {
+    const principal = getClientPrincipal(req);
+    if (!principal || !principal.userRoles?.includes("authenticated")) {
+      return { status: 401, jsonBody: { error: "not authenticated" } };
     }
-    const user = await createUser(body.name);
-    ctx.log("users.create.ok", { id: user.id });
-    return { status: 201, jsonBody: user };
+
+    const authId = getAuthId(principal);
+
+    const body = (await req.json().catch(() => null)) as {
+      pseudo?: string;
+      email?: string;
+    } | null;
+    const pseudo = body?.pseudo?.trim();
+    const email = body?.email?.trim() || principal.userDetails;
+
+    if (!pseudo) {
+      return { status: 400, jsonBody: { error: "pseudo is required" } };
+    }
+
+    try {
+      const user = await createOrUpdateUser({ authId, pseudo, email });
+      ctx.log(`createUser OK authId=${authId} pseudo="${pseudo}"`);
+      return { status: 201, jsonBody: user };
+    } catch (e: any) {
+      ctx.error?.(`createUser ERROR: ${e?.message || e}`);
+      return { status: 500, jsonBody: { error: "internal_error" } };
+    }
   },
 });

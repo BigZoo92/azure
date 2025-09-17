@@ -1,16 +1,21 @@
 import { CosmosClient } from "@azure/cosmos";
 
-const endpoint = process.env.COSMOS_ENDPOINT;
-const key = process.env.COSMOS_KEY;
-const databaseId = process.env.COSMOS_DB ?? "usersdb";
-const containerId = process.env.COSMOS_CONTAINER ?? "users";
+export function getCosmos() {
+  const endpoint = process.env.COSMOS_ENDPOINT;
+  const key = process.env.COSMOS_KEY;
+  const dbName = process.env.COSMOS_DB || "pollsdb";
+  const usersContainer = process.env.USERS_CONTAINER || "users";
+  const votesContainer = process.env.VOTES_CONTAINER || "votes";
 
-if (!endpoint || !key) {
-  throw new Error(
-    "COSMOS_ENDPOINT/COSMOS_KEY manquants (vérifie local.settings.json)"
-  );
+  if (!endpoint || !key) return null;
+
+  const client = new CosmosClient({ endpoint, key });
+  const db = client.database(dbName);
+
+  return {
+    client,
+    db,
+    users: db.container(usersContainer),
+    votes: db.container(votesContainer),
+  };
 }
-
-export const client = new CosmosClient({ endpoint, key });
-export const database = client.database(databaseId);
-export const container = database.container(containerId);
