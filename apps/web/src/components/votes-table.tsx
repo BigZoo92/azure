@@ -1,9 +1,9 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import type { Vote } from "@/lib/types";
+import { Separator } from "@/components/ui/separator";
 
 function mask(userId: string) {
-  // masque simple pour gh:xxxx / local:email
   if (userId.startsWith("gh:")) return `gh:${userId.slice(3, 9)}…`;
   if (userId.startsWith("github|")) return `gh|${userId.slice(7, 13)}…`;
   if (userId.startsWith("local:")) {
@@ -17,38 +17,56 @@ function mask(userId: string) {
 }
 
 export function VotesTable({ votes }: { votes: Vote[] }) {
+  const list = votes.slice().reverse().slice(0, 12);
+
   return (
-    <Card className="w-full max-w-2xl">
-      <CardHeader>
-        <CardTitle>Derniers votes</CardTitle>
+    <Card className="border border-white/5 bg-card/60 backdrop-blur supports-[backdrop-filter]:bg-card/50">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-lg">Derniers votes</CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-2">
-          {votes
-            .slice()
-            .reverse()
-            .slice(0, 12)
-            .map((v) => (
+      <CardContent className="space-y-2">
+        {list.map((v, i) => {
+          const yes = v.choice === "yes";
+          return (
+            <div
+              key={v.id + v.createdAt + i}
+              className="group relative flex items-center justify-between rounded-xl border border-white/5 bg-muted/20 px-3 py-2"
+            >
+              {/* bande de couleur à gauche */}
               <div
-                key={v.id + v.createdAt}
-                className="flex items-center justify-between rounded-md border px-3 py-2"
-              >
-                <div className="text-sm">
-                  <div className="font-medium">{mask(v.userId)}</div>
-                  <div className="text-muted-foreground">
-                    {new Date(v.createdAt).toLocaleString()}
-                  </div>
+                className={`absolute left-0 top-0 h-full w-1 rounded-l-xl ${
+                  yes ? "bg-emerald-500/80" : "bg-rose-500/80"
+                }`}
+              />
+              <div className="pl-3">
+                <div className="font-medium leading-none">{mask(v.userId)}</div>
+                <div className="text-muted-foreground text-xs">
+                  {new Date(v.createdAt).toLocaleString()}
                 </div>
-                <Badge variant={v.choice === "yes" ? "default" : "secondary"}>
-                  {v.choice === "yes" ? "Oui" : "Non"}
-                </Badge>
               </div>
-            ))}
-          {votes.length === 0 && (
-            <div className="text-sm text-muted-foreground">
-              Aucun vote pour l’instant.
+              <Badge
+                variant="outline"
+                className={
+                  yes
+                    ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300"
+                    : "border-rose-500/40 bg-rose-500/10 text-rose-300"
+                }
+              >
+                {yes ? "Oui" : "Non"}
+              </Badge>
             </div>
-          )}
+          );
+        })}
+
+        {list.length === 0 && (
+          <div className="rounded-xl border border-white/5 bg-muted/10 p-4 text-center text-sm text-muted-foreground">
+            Aucun vote pour l’instant.
+          </div>
+        )}
+
+        <Separator className="mt-2 opacity-40" />
+        <div className="text-muted-foreground pt-1 text-center text-xs">
+          Historique limité aux 12 derniers votes.
         </div>
       </CardContent>
     </Card>
